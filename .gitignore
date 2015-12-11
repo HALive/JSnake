@@ -3,3 +3,6 @@ build/
 *.dylib
 *.so
 *.jnilib
+.idea/
+.idea/workspace.xml
+JSnake.iml

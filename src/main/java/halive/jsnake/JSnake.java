@@ -56,7 +56,7 @@ public class JSnake {
             try {
                 ProgressMonitor mon = new ProgressMonitor(null, "Extracting natives...", "", 0, 100);
                 mon.setMillisToPopup(0);
-                NativeLoader loader = new NativeLoader(JSnake.class, null);
+                NativeLoader loader = new NativeLoader(JSnake.class);
                 loader.copyNatives(nativesFolder, mon);
                 mon.setNote("Updating Library Path");
                 mon.close();

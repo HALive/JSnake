@@ -8,10 +8,16 @@ import org.newdawn.slick.state.StateBasedGame;
 import java.awt.Dimension;
 import java.awt.Point;
 
+/**
+ * This class describes a Rectangle displayed in The Background of the snake Game
+ * The drawn rectangle is not filled its ust a frame
+ */
 public class GridRectangle extends Component {
 
+    /**
+     * Stores the Color of the Rectangle
+     */
     private Color color;
-
 
     public GridRectangle(Point position, Dimension size, Color color) {
         super(position, size);

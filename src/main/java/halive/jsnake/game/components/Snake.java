@@ -1,52 +1,90 @@
 package halive.jsnake.game.components;
 
-import halive.jsnake.game.core.SnakeGame;
+import halive.jsnake.game.core.SnakeGameState;
+import halive.util.SlickUtils;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.state.StateBasedGame;
 
 import java.awt.Point;
 
+/**
+ * This Class describes The Snake Head to whitch the child nodes are attached
+ */
 public class Snake extends SnakePart<Snake.SnakeNode> {
 
-    private static final int CYCLES_PER_TICK = 10;
+    /**
+     * This defines the Cycles (update() calls) to toggle one tick
+     */
+    private static final int CYCLES_PER_TICK = 5;
 
-    private Point movingDirecton;
+    /**
+     * Defines the Possible Colors of SnakeNodes
+     */
+    private static final Color[] NODE_COLORS = {Color.blue, Color.green, Color.orange, Color.yellow,
+            Color.lightGray, Color.white};
 
-    private SnakeGame game;
+    /**
+     * Stores the Current movement vector
+     */
+    private Point movingDirection;
 
+    /**
+     * Used to reference back
+     */
+    private SnakeGameState game;
+
+    /**
+     * Counts the cycles, used to determine the tick point
+     */
     private int cycleCounter = 0;
 
-    public boolean addNode = false;
-
-    public Snake(Point position, SnakeGame game) {
+    /**
+     * Creates a new Snake at the given grid Positon
+     *
+     * @param position
+     * @param game
+     */
+    public Snake(Point position, SnakeGameState game) {
         super(position);
-        movingDirecton = new Point(0, 0);
+        movingDirection = new Point(0, 0);
         this.game = game;
+        setColor(Color.red);
     }
 
-
+    /**
+     * Sets the movement Direction to move up
+     */
     public void moveUp() {
-        movingDirecton = new Point(0, -1);
+        movingDirection = new Point(0, -1);
     }
 
+    /**
+     * Sets the movement direction to move down
+     */
     public void moveDown() {
-        movingDirecton = new Point(0, 1);
+        movingDirection = new Point(0, 1);
     }
 
+    /**
+     * Stes the Movement direction to move Left
+     */
     public void moveLeft() {
-        movingDirecton = new Point(-1, 0);
+        movingDirection = new Point(-1, 0);
     }
 
+    /**
+     * Sets the movement direction to move right
+     */
     public void moveRight() {
-        movingDirecton = new Point(1, 0);
+        movingDirection = new Point(1, 0);
     }
 
     @Override
     public void update(GameContainer c, StateBasedGame sbg, int d, int mouseX, int mouseY) {
         if (cycleCounter == 0) {
             Point oldGridPos = gridPos;
-            Point newPos = new Point(gridPos.x + movingDirecton.x, gridPos.y + movingDirecton.y);
+            Point newPos = new Point(gridPos.x + movingDirection.x, gridPos.y + movingDirection.y);
             newPos.x = (newPos.x % game.getGridDimension().width);
             if (newPos.x < 0) {
                 newPos.x = game.getGridDimension().width - 1;
@@ -55,13 +93,17 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
             if (newPos.y < 0) {
                 newPos.y = game.getGridDimension().height - 1;
             }
+            if (isOnSnake(newPos)) {
+                if (childNode != null) {
+                    childNode.swapColors();
+                }
+            }
 
             updatePosition(newPos);
             Point foodPosition = game.getFood().getGridPosition();
-            if (gridPos.x == (foodPosition.x - 1) && gridPos.y == (foodPosition.y - 1) || addNode) {
+            if (gridPos.x == (foodPosition.x - 1) && gridPos.y == (foodPosition.y - 1)) {
                 game.spawnNewFoodRectangle();
                 addNode(oldGridPos);
-                addNode = false;
             }
             if (childNode != null) {
                 childNode.updatePosition(oldGridPos);
@@ -71,6 +113,11 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
         cycleCounter = cycleCounter % CYCLES_PER_TICK;
     }
 
+    /**
+     * Adds a node to the end
+     *
+     * @param oldGridPos
+     */
     private void addNode(Point oldGridPos) {
         if (childNode != null) {
             childNode.addNodeToEndAndUpdatePos(oldGridPos);
@@ -79,16 +126,33 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
         }
     }
 
+    /**
+     * This class descibes a Childnode of the snakeHead
+     */
     public class SnakeNode extends SnakePart<SnakeNode> {
 
+        /**
+         * Creates a new SnakeNode with the given Grid Positon.
+         * <p>
+         * This Constructor also determines a random Color for the created child node
+         *
+         * @param p
+         */
         public SnakeNode(Point p) {
             super(p);
-            snakeColor = Color.blue;
+            Color color = NODE_COLORS[game.getRandom().nextInt(NODE_COLORS.length)];
+            boolean invert = game.getRandom().nextBoolean();
+            setColor(invert ? SlickUtils.inverColor(color) : color);
         }
 
+        /**
+         * Adds a new node at the end of the snake. The given positon is a gridPostion
+         *
+         * @param np
+         */
         private void addNodeToEndAndUpdatePos(Point np) {
             Point oldPos = gridPos;
-            this.position = new Point((np.x + 1) * SnakeGame.RECT_SIZE, (np.y + 1) * SnakeGame.RECT_SIZE);
+            this.position = new Point((np.x + 1) * SnakeGameState.RECT_SIZE, (np.y + 1) * SnakeGameState.RECT_SIZE);
             gridPos = np;
             if (childNode != null) {
                 childNode.addNodeToEndAndUpdatePos(oldPos);
@@ -97,9 +161,14 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
             }
         }
 
+        /**
+         * Updates postions o the current node and its child nodes
+         *
+         * @param np
+         */
         public void updatePosition(Point np) {
             Point oldPos = gridPos;
-            this.position = new Point((np.x + 1) * SnakeGame.RECT_SIZE, (np.y + 1) * SnakeGame.RECT_SIZE);
+            this.position = new Point((np.x + 1) * SnakeGameState.RECT_SIZE, (np.y + 1) * SnakeGameState.RECT_SIZE);
             gridPos = np;
             if (childNode != null) {
                 childNode.updatePosition(oldPos);

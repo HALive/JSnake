@@ -1,6 +1,7 @@
 package halive.jsnake.game;
 
 import halive.jsnake.JSnake;
+import halive.jsnake.config.JSnakeConfig;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.GameState;
@@ -10,8 +11,8 @@ import java.util.logging.Level;
 
 public class JSnakeGame extends StateBasedGame {
 
-    public JSnakeGame(String name) {
-        super(name);
+    public JSnakeGame(JSnakeConfig config) {
+        super("JSnake");
     }
 
     @Override

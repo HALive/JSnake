@@ -124,6 +124,7 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
             }
             if (isOnSnake(newPos) && childNode != null) {
                 remainingCrossings--;
+                game.updateRemainigCrossings(remainingCrossings);
                 if (remainingCrossings < 0) {
                     game.setGameOver();
                 }
@@ -138,8 +139,9 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
                 game.spawnNewFoodRectangle();
                 addNode(oldGridPos);
                 length = this.getSnakeLength();
-                game.updateScore();
+                game.updateScore(length);
                 remainingCrossings += ((length % FOOD_EATEN_PER_CROSSING) == 0) ? 1 : 0;
+                game.updateRemainigCrossings(remainingCrossings);
             }
             if (childNode != null) {
                 childNode.updatePosition(oldGridPos);

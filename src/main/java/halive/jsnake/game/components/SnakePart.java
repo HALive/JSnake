@@ -12,6 +12,7 @@ import java.awt.Point;
 
 /**
  * Describes the abstract Portion of a SnakeHead and its chils nodes
+ *
  * @param <T>
  */
 public abstract class SnakePart<T extends SnakePart> extends Component {
@@ -56,7 +57,6 @@ public abstract class SnakePart<T extends SnakePart> extends Component {
      * Converts a GridPositon to a On Screen Positon
      *
      * @param position
-     *
      * @return
      */
     public static Point convertToDisplayPos(Point position) {
@@ -77,7 +77,6 @@ public abstract class SnakePart<T extends SnakePart> extends Component {
      * Returns true if the given grid positon is on the Snake
      *
      * @param p
-     *
      * @return
      */
     public boolean isOnSnake(Point p) {
@@ -128,5 +127,15 @@ public abstract class SnakePart<T extends SnakePart> extends Component {
         if (childNode != null) {
             childNode.setColor(color);
         }
+    }
+
+    /**
+     * Returns the Length of the snake from the Current point. (i Called Externally)
+     * It returns the length ( Amount of nodes ) of the snake.
+     *
+     * @return The returnvalue is at least 1.
+     */
+    public int getSnakeLength() {
+        return childNode == null ? 1 : 1 + childNode.getSnakeLength();
     }
 }

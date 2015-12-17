@@ -17,6 +17,10 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
      * This defines the Cycles (update() calls) to toggle one tick
      */
     private static final int CYCLES_PER_TICK = 5;
+    /**
+     * You have to eat the amount of food given in the constant to get another crossing.
+     */
+    private static final int FOOD_EATEN_PER_CROSSING = 10;
 
     /**
      * Defines the Possible Colors of SnakeNodes
@@ -28,6 +32,18 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
      * Stores the Current movement vector
      */
     private Point movingDirection;
+
+    /**
+     * Stores the Reamining number of allowed Crossings.
+     * Every time a new game starts this is set to zero and every time you
+     * eat ten food items this gets incremented by one.
+     * It gets decremented if you cross yourself. once the number is smaller then 0 you loose.
+     */
+    private int remainingCrossings = 0;
+    /**
+     * Stores the length of the snake;
+     */
+    private int length;
 
     /**
      * Used to reference back
@@ -56,28 +72,41 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
      * Sets the movement Direction to move up
      */
     public void moveUp() {
-        movingDirection = new Point(0, -1);
+        move(new Point(0, -1));
     }
 
     /**
      * Sets the movement direction to move down
      */
     public void moveDown() {
-        movingDirection = new Point(0, 1);
+        move(new Point(0, 1));
     }
 
     /**
      * Stes the Movement direction to move Left
      */
     public void moveLeft() {
-        movingDirection = new Point(-1, 0);
+        move(new Point(-1, 0));
     }
 
     /**
      * Sets the movement direction to move right
      */
     public void moveRight() {
-        movingDirection = new Point(1, 0);
+        move(new Point(1, 0));
+    }
+
+    /**
+     * Sets the Movement direction to a specific direction
+     *
+     * @param direction should be eiter (1,0),(-1,0),(0,1) or (0,-1)
+     */
+    private void move(Point direction) {
+        if ((direction.y == movingDirection.y && direction.x == movingDirection.x) ||
+                ((direction.x + movingDirection.x) == 0 && (direction.y + movingDirection.y) == 0)) {
+            return;
+        }
+        movingDirection = direction;
     }
 
     @Override
@@ -93,7 +122,11 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
             if (newPos.y < 0) {
                 newPos.y = game.getGridDimension().height - 1;
             }
-            if (isOnSnake(newPos)) {
+            if (isOnSnake(newPos) && childNode != null) {
+                remainingCrossings--;
+                if (remainingCrossings < 0) {
+                    game.setGameOver();
+                }
                 if (childNode != null) {
                     childNode.swapColors();
                 }
@@ -104,6 +137,9 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
             if (gridPos.x == (foodPosition.x - 1) && gridPos.y == (foodPosition.y - 1)) {
                 game.spawnNewFoodRectangle();
                 addNode(oldGridPos);
+                length = this.getSnakeLength();
+                game.updateScore();
+                remainingCrossings += ((length % FOOD_EATEN_PER_CROSSING) == 0) ? 1 : 0;
             }
             if (childNode != null) {
                 childNode.updatePosition(oldGridPos);

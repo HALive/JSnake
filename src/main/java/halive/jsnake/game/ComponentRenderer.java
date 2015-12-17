@@ -26,6 +26,10 @@ public class ComponentRenderer {
         components.add(new RenderTask(c, priority));
     }
 
+    public void init(GameContainer c, StateBasedGame g) {
+        components.forEach((co) -> co.component.init(c, g));
+    }
+
     public void render(Graphics g, GameContainer c, StateBasedGame sbg) {
         final PriorityQueue<RenderTask> queue =
                 new PriorityQueue<>((Comparator<RenderTask>) (o1, o2) -> o1.priority - o2.priority);

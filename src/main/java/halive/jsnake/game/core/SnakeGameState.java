@@ -2,8 +2,10 @@ package halive.jsnake.game.core;
 
 import halive.jsnake.game.ComponentRenderer;
 import halive.jsnake.game.GameStates;
+import halive.jsnake.game.components.CenterLabel;
 import halive.jsnake.game.components.FoodRectangle;
 import halive.jsnake.game.components.GridRectangle;
+import halive.jsnake.game.components.Label;
 import halive.jsnake.game.components.Snake;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
@@ -19,19 +21,66 @@ import java.util.Random;
 
 public class SnakeGameState extends BasicGameState {
 
+    /**
+     * Defines the size of a Rectangle
+     */
     public static final int RECT_SIZE = 20;
 
+    /**
+     * Stores the Grid Of Rectangles rendered in the background
+     */
     private GridRectangle[][] grid;
 
+    /**
+     * This references to the Most important component in the game. The Snake.
+     */
     private Snake snake;
+    /**
+     * Stores the current FoodRectangle object
+     */
     private FoodRectangle food;
 
+    /**
+     * References to the StateBasedGame, this gets captured in the init Mehtod
+     */
     private StateBasedGame game;
+    /**
+     * This Renderer Handles the Rendering of most
+     * of the components in the game (like the grid, the snake and the labels)
+     * <p>
+     * The only Component that is not Rendered by the Renderer is the FoodRectangle
+     */
     private ComponentRenderer renderer;
 
+    /**
+     * This Random Number Generator is used to Generate The colors
+     * of Snake Child Nodes and to generate the positons of the food.
+     */
     private Random random = new Random();
 
+    /**
+     * Stores the Resulution the game runs at
+     */
     private Dimension screenDimension;
+
+    /**
+     * Stores the current score (Starts at 1)
+     */
+    private int score = 1;
+
+    /**
+     * This Label Displays the Score
+     */
+    private Label scoreLabel;
+    /**
+     * This Label is used to Display the Remaining Crossings
+     */
+    private Label remainingCrossingsLabel;
+
+    /**
+     * Flag, thats set to true if the Game should end.
+     */
+    private boolean gameOver = false;
 
     @Override
     public int getID() {
@@ -42,7 +91,12 @@ public class SnakeGameState extends BasicGameState {
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
         this.game = game;
         this.screenDimension = new Dimension(container.getWidth(), container.getHeight());
+    }
 
+    @Override
+    public void enter(GameContainer container, StateBasedGame game) throws SlickException {
+        gameOver = false;
+        score = 1;
         renderer = new ComponentRenderer();
 
         grid = new GridRectangle[(screenDimension.width / RECT_SIZE) - 2][(screenDimension.height / RECT_SIZE) - 2];
@@ -59,43 +113,58 @@ public class SnakeGameState extends BasicGameState {
         renderer.addComponentToRender(prio, snake);
         prio++;
         spawnNewFoodRectangle();
+        scoreLabel = new CenterLabel(new Point(0, 5), new Dimension(screenDimension.width, 10),
+                "Score :" + score);
+        renderer.addComponentToRender(prio, scoreLabel);
+        prio++;
+        remainingCrossingsLabel = new Label(new Point(10, 5), "Remaining Crossings: " + 0);
+        renderer.addComponentToRender(prio, scoreLabel);
+        prio++;
+
+        renderer.init(container, game);
     }
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         renderer.render(g, container, game);
-        food.render(g,container,game);
+        food.render(g, container, game);
     }
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-        int mouseX = Mouse.getX();
-        int mouseY = (int) (screenDimension.getHeight() - Mouse.getY());
-        renderer.update(container, game, delta, mouseX, mouseY);
+        if (!gameOver) {
+            int mouseX = Mouse.getX();
+            int mouseY = (int) (screenDimension.getHeight() - Mouse.getY());
+            renderer.update(container, game, delta, mouseX, mouseY);
+        } else {
+            game.enterState(GameStates.MAIN_MENU.getID());
+        }
     }
 
     /**
      * Handles Key input
+     *
      * @param key
      * @param c
      */
     @Override
     public void keyPressed(int key, char c) {
-        if(KeyControls.UP.isKeycodeVaild(key)) {
+        if (KeyControls.UP.isKeycodeVaild(key)) {
             snake.moveUp();
-        } else if(KeyControls.DOWN.isKeycodeVaild(key)) {
+        } else if (KeyControls.DOWN.isKeycodeVaild(key)) {
             snake.moveDown();
-        } else if(KeyControls.LEFT.isKeycodeVaild(key)) {
+        } else if (KeyControls.LEFT.isKeycodeVaild(key)) {
             snake.moveLeft();
-        } else if(KeyControls.RIGHT.isKeycodeVaild(key)) {
+        } else if (KeyControls.RIGHT.isKeycodeVaild(key)) {
             snake.moveRight();
-        } else if(KeyControls.ESCAPE.isKeycodeVaild(key)) {
+        } else if (KeyControls.ESCAPE.isKeycodeVaild(key)) {
 
         }
     }
 
     /**
      * Returns the current Food Rectangle
+     *
      * @return
      */
     public FoodRectangle getFood() {
@@ -108,14 +177,19 @@ public class SnakeGameState extends BasicGameState {
     public void spawnNewFoodRectangle() {
         Point point = null;
         do {
-            point = new Point(random.nextInt(grid.length)+1, random.nextInt(grid[0].length)+1);
-        }while(snake.isOnSnake(point));
-        System.out.printf("Spawning food at x=%d y=%d\n", point.x, point.y);
+            point = new Point(random.nextInt(grid.length) + 1, random.nextInt(grid[0].length) + 1);
+            if (snake.isOnSnake(point)) {
+                //System.out.printf("x=%d y=%d is on the snake\n", point.x, point.y);
+                continue;
+            }
+        } while (false);
+        //System.out.printf("New Food Position x=%d y=%d\n", point.x, point.y);
         food = new FoodRectangle(point);
     }
 
     /**
      * Returns the dimesion of the Grid
+     *
      * @return
      */
     public Dimension getGridDimension() {
@@ -124,9 +198,25 @@ public class SnakeGameState extends BasicGameState {
 
     /**
      * Retruns the Random Number Generator generated by this class
+     *
      * @return
      */
     public Random getRandom() {
         return random;
+    }
+
+    /**
+     * Updates the Score Value to the current length of the snake.
+     */
+    public void updateScore() {
+        score = snake.getSnakeLength();
+        scoreLabel.setMessage("Score: " + score);
+    }
+
+    /**
+     * Once this method is called all updating is stopped and the game is over.
+     */
+    public void setGameOver() {
+        gameOver = true;
     }
 }

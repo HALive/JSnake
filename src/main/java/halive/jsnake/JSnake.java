@@ -36,6 +36,7 @@ public class JSnake {
             AppGameContainer container = new AppGameContainer(new JSnakeGame("JSnake"), 800, 600, false);
             container.setVSync(true);
             container.setVerbose(true);
+            container.setShowFPS(false);
             container.start();
         } catch (SlickException e) {
             logger.log(Level.SEVERE, "An error occured.",e);

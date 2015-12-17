@@ -27,6 +27,15 @@ public abstract class Component {
     }
 
     /**
+     * This method is called to Initialize things that might need the Container/StateBasedGame to Initialize
+     *
+     * @param c    The Game Container (Parameter from slick 2d)
+     * @param game the StateBasedGame (Parameter from Slick 2d)
+     */
+    public void init(GameContainer c, StateBasedGame game) {
+    }
+
+    /**
      * This method is Called by the Component Renderes Update method which gets invoked by Slick2ds update Method
      *
      * @param c      The Game Container (Parameter from slick 2d)

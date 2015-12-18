@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015, HALive
+ * For Licence Information see Licence File.
+ */
+
 package halive.jsnake.config;
 
 import org.json.JSONObject;
@@ -25,7 +30,11 @@ public class JSnakeConfig {
         } else if (configFileDestination.isDirectory()) {
             throw new IOException("Invalid Config file. This is a Directory.");
         } else {
-
+            initializeWithDefaults();
         }
+    }
+
+    private void initializeWithDefaults() {
+
     }
 }

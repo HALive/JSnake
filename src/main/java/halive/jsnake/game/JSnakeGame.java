@@ -27,7 +27,7 @@ public class JSnakeGame extends StateBasedGame {
                 GameState s = state.getStateClass().newInstance();
                 addState(s);
             } catch (InstantiationException | IllegalAccessException e) {
-                JSnake.logger.log(Level.SEVERE, "Could not Initialize GameStates.", e);
+                JSnake.logger.log(Level.ALL, "Could not Initialize GameStates.", e);
             }
         }
     }

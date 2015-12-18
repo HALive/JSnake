@@ -15,11 +15,14 @@ import org.newdawn.slick.SlickException;
 
 import javax.swing.ProgressMonitor;
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class JSnake {
+
+    public static final File CONFIG_FILE = new File("config.json");
 
     /**
      * Defines a Logger to Log Exceptions that might occur
@@ -46,6 +49,10 @@ public class JSnake {
         initializeLogger();
         initializeNatives(devMode);
         JSnakeConfig config = loadConfig();
+        if (config == null) {
+            logger.log(Level.ALL, "Closing the Application. No Config has been Loaded.");
+            return;
+        }
         launchGame();
     }
 
@@ -54,7 +61,13 @@ public class JSnake {
      */
     private static JSnakeConfig loadConfig() {
         logger.info("Loading Configuration File...");
-        return null;
+        JSnakeConfig config = null;
+        try {
+            config = new JSnakeConfig(CONFIG_FILE);
+        } catch (IOException e) {
+            logger.log(Level.ALL, "Something went wrong loading the config file.", e);
+        }
+        return config;
     }
 
     /**
@@ -69,7 +82,7 @@ public class JSnake {
             container.setShowFPS(false);
             container.start();
         } catch (SlickException e) {
-            logger.log(Level.SEVERE, "An error occured.", e);
+            logger.log(Level.ALL, "An error occured.", e);
             System.exit(-1);
         }
     }
@@ -79,6 +92,7 @@ public class JSnake {
      */
     private static void initializeLogger() {
         PrintStreamHandler handler = new PrintStreamHandler(System.out);
+        handler.setLevel(Level.ALL);
         handler.setFormatter(new SimpleFormatter());
         logger.addHandler(handler);
     }
@@ -104,7 +118,7 @@ public class JSnake {
                 mon.setNote("Updating Library Path");
                 mon.close();
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error loading extracting natives", e);
+                logger.log(Level.ALL, "Error loading extracting natives", e);
                 System.exit(-1);
             }
         }
@@ -112,7 +126,7 @@ public class JSnake {
         try {
             NativeLoaderUtils.addLibraryPath(nativesFolder.toString());
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Could not Register Natives. Aborting.", e);
+            logger.log(Level.ALL, "Could not Register Natives. Aborting.", e);
             System.exit(-1);
         }
     }

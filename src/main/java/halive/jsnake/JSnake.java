@@ -5,6 +5,7 @@
 
 package halive.jsnake;
 
+import halive.jsnake.config.ConfigKeys;
 import halive.jsnake.config.JSnakeConfig;
 import halive.jsnake.game.JSnakeGame;
 import halive.nativeloader.NativeLoader;
@@ -53,7 +54,7 @@ public class JSnake {
             logger.log(Level.ALL, "Closing the Application. No Config has been Loaded.");
             return;
         }
-        launchGame();
+        launchGame(config);
     }
 
     /**
@@ -73,10 +74,14 @@ public class JSnake {
     /**
      * Launches the game
      */
-    private static void launchGame() {
+    private static void launchGame(JSnakeConfig cfg) {
         logger.info("Launching game....");
         try {
-            AppGameContainer container = new AppGameContainer(new JSnakeGame(null), 1000, 800, false);
+            int w = cfg.getContents().getJSONObject(ConfigKeys.WINDOW_DIMENSION.getKey())
+                    .getInt(ConfigKeys.WINDOW_WIDTH.getKey());
+            int h = cfg.getContents().getJSONObject(ConfigKeys.WINDOW_DIMENSION.getKey())
+                    .getInt(ConfigKeys.WINDOW_HEIGHT.getKey());
+            AppGameContainer container = new AppGameContainer(new JSnakeGame(cfg), w, h, false);
             container.setVSync(true);
             container.setVerbose(true);
             container.setShowFPS(false);

@@ -5,13 +5,17 @@
 
 package halive.jsnake.game.core;
 
+import halive.jsnake.config.ConfigKeys;
 import halive.jsnake.game.ComponentRenderer;
 import halive.jsnake.game.GameStates;
+import halive.jsnake.game.JSnakeGame;
 import halive.jsnake.game.components.CenterLabel;
 import halive.jsnake.game.components.FoodRectangle;
 import halive.jsnake.game.components.GridRectangle;
 import halive.jsnake.game.components.Label;
 import halive.jsnake.game.components.Snake;
+import halive.util.SlickUtils;
+import org.json.JSONArray;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -34,6 +38,27 @@ public class SnakeGameState extends BasicGameState {
     public static final Color FADE_COLOR = new Color(Color.lightGray.r, Color.lightGray.g, Color.lightGray.b, 0.5F);
 
     /**
+     * Stores the FoodColor loaded from the Config file
+     */
+    private Color foodColor;
+    /**
+     * Stores the Snake Head Color loaded from the config file
+     */
+    private Color snakeHeadColor;
+    /**
+     * Stores the Colors of the Nodes Loaded from the config file
+     */
+    private Color[] snakeNodeColors;
+    /**
+     * Stores the intervall of cycles per Snake update (loaded from the cfg)
+     */
+    private int snakeCyclesPerTick;
+    /**
+     * Stores the food Eaten needed to get another crossing. (Loaded from the config)
+     */
+    private int snakeFoodPerCrossing;
+
+    /**
      * Stores the Grid Of Rectangles rendered in the background
      */
     private GridRectangle[][] grid;
@@ -50,7 +75,7 @@ public class SnakeGameState extends BasicGameState {
     /**
      * References to the StateBasedGame, this gets captured in the init Mehtod
      */
-    private StateBasedGame game;
+    private JSnakeGame game;
     /**
      * This Renderer Handles the Rendering of most
      * of the components in the game (like the grid, the snake and the labels)
@@ -89,6 +114,9 @@ public class SnakeGameState extends BasicGameState {
      */
     private boolean gameOver = false;
 
+    /**
+     * This Flag is True if the Game should get paused.
+     */
     private boolean paused = false;
 
     @Override
@@ -98,8 +126,22 @@ public class SnakeGameState extends BasicGameState {
 
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
-        this.game = game;
+        this.game = (JSnakeGame) game;
         this.screenDimension = new Dimension(container.getWidth(), container.getHeight());
+        foodColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getContents()
+                .getString(ConfigKeys.FOOD_COLOR.getKey()));
+        snakeHeadColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getContents()
+                .getString(ConfigKeys.SNAKE_HEAD_COLOR.getKey()));
+        JSONArray a = this.game.getConfig().getContents().getJSONArray(ConfigKeys.SNAKE_NODE_COLORS.getKey());
+        snakeNodeColors = new Color[a.length()];
+        final int[] idx = {0};
+        a.forEach(o -> {
+            snakeNodeColors[idx[0]] = SlickUtils.getColorFromRGBString(o.toString());
+            idx[0]++;
+        });
+
+        snakeCyclesPerTick = this.game.getConfig().getContents().getInt(ConfigKeys.CYCLES_PER_TICK.getKey());
+        snakeFoodPerCrossing = this.game.getConfig().getContents().getInt(ConfigKeys.FOOD_PER_CROSSING.getKey());
     }
 
     @Override
@@ -118,7 +160,8 @@ public class SnakeGameState extends BasicGameState {
                 prio++;
             }
         }
-        snake = new Snake(new Point(random.nextInt(grid.length), random.nextInt(grid[0].length)), this);
+        snake = new Snake(new Point(random.nextInt(grid.length), random.nextInt(grid[0].length)), snakeHeadColor,
+                snakeNodeColors, snakeCyclesPerTick, snakeFoodPerCrossing, this);
         renderer.addComponentToRender(prio, snake);
         prio++;
         spawnNewFoodRectangle();
@@ -139,7 +182,7 @@ public class SnakeGameState extends BasicGameState {
         food.render(g, container, game);
         if (paused) {
             g.setColor(FADE_COLOR);
-            g.fillRect(0,0, screenDimension.width, screenDimension.height);
+            g.fillRect(0, 0, screenDimension.width, screenDimension.height);
         }
     }
 
@@ -199,7 +242,7 @@ public class SnakeGameState extends BasicGameState {
                 continue;
             }
         } while (false);
-        food = new FoodRectangle(point);
+        food = new FoodRectangle(point, foodColor);
     }
 
     /**

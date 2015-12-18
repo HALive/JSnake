@@ -24,6 +24,7 @@ public abstract class HoverableComponent extends Component {
 
     /**
      * Returns true if the item is currently hovered
+     *
      * @return
      */
     public boolean isItemHovered() {
@@ -37,6 +38,7 @@ public abstract class HoverableComponent extends Component {
 
     /**
      * This method cheks if the current mousePostion is on the Object.
+     *
      * @param x Mouse X Position
      * @param y Mouse Y Position
      */
@@ -51,6 +53,7 @@ public abstract class HoverableComponent extends Component {
 
     /**
      * Returns true if the given coordinates are on the component
+     *
      * @param x x Position
      * @param y y Position
      * @return
@@ -62,6 +65,7 @@ public abstract class HoverableComponent extends Component {
 
     /**
      * This method is called by the update() Method if the metod gets hovered
+     *
      * @param x Mouse X Position
      * @param y Mouse Y Position
      */

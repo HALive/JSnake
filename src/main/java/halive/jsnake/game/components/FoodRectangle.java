@@ -21,15 +21,16 @@ public class FoodRectangle extends Component {
     /**
      * Describes the Color of the food Rectangle
      */
-    private Color color = Color.red;
+    private Color color;
     /**
      * Stores teh GridPositon of the Object
      */
     private Point gridPosition;
 
-    public FoodRectangle(Point position) {
+    public FoodRectangle(Point position, Color c) {
         super(new Point(position.x * SnakeGameState.RECT_SIZE, position.y * SnakeGameState.RECT_SIZE), Snake.RECT_DIM);
         this.gridPosition = position;
+        this.color = c;
     }
 
     /**
@@ -52,5 +53,14 @@ public class FoodRectangle extends Component {
      */
     public Point getGridPosition() {
         return gridPosition;
+    }
+
+    /**
+     * Sets the Color of the Food Rectangle
+     *
+     * @param color
+     */
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

@@ -50,7 +50,7 @@ public class Button extends HoverableComponent {
     public Button(Point pos, Dimension size, Color backgroundColor, String displayText) {
         super(pos, size);
         this.backgroundColor = backgroundColor;
-        hoverBgColor = SlickUtils.inverColor(backgroundColor);
+        hoverBgColor = SlickUtils.invertColor(backgroundColor);
         this.displayText = displayText;
     }
 

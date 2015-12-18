@@ -66,4 +66,8 @@ public class JSnakeConfig {
             }
         }
     }
+
+    public JSONObject getContents() {
+        return configFileContents;
+    }
 }

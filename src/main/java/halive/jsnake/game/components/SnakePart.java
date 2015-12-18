@@ -128,7 +128,7 @@ public abstract class SnakePart<T extends SnakePart> extends Component {
      */
     public void setColor(Color color) {
         snakeColor = color;
-        frameColor = SlickUtils.inverColor(color);
+        frameColor = SlickUtils.invertColor(color);
         if (childNode != null) {
             childNode.setColor(color);
         }

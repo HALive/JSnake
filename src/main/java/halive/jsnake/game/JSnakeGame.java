@@ -16,8 +16,11 @@ import java.util.logging.Level;
 
 public class JSnakeGame extends StateBasedGame {
 
+    private JSnakeConfig config;
+
     public JSnakeGame(JSnakeConfig config) {
         super("JSnake");
+        this.config = config;
     }
 
     @Override
@@ -30,5 +33,9 @@ public class JSnakeGame extends StateBasedGame {
                 JSnake.logger.log(Level.ALL, "Could not Initialize GameStates.", e);
             }
         }
+    }
+
+    public JSnakeConfig getConfig() {
+        return config;
     }
 }

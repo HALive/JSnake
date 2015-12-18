@@ -19,18 +19,21 @@ import java.awt.Point;
 public class Snake extends SnakePart<Snake.SnakeNode> {
 
     /**
-     * This defines the Cycles (update() calls) to toggle one tick
+     * This defines the Cycles (update() calls) to toggle one tick,
+     * This Information gets Loaded from teh config file
      */
-    private static final int CYCLES_PER_TICK = 5;
+    private int cyclesPerTick = 5;
     /**
      * You have to eat the amount of food given in the constant to get another crossing.
+     * this gets Loaded by the config file, is given through the Constructor
      */
-    private static final int FOOD_EATEN_PER_CROSSING = 10;
+    private int foodPerCrossing = 10;
 
     /**
      * Defines the Possible Colors of SnakeNodes
+     * Loaded From the Config File. the Value is given by the Constructor
      */
-    private static final Color[] NODE_COLORS = {Color.blue, Color.green, Color.orange, Color.yellow,
+    private Color[] nodeColors = {Color.blue, Color.green, Color.orange, Color.yellow,
             Color.lightGray, Color.white};
 
     /**
@@ -61,16 +64,24 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
     private int cycleCounter = 0;
 
     /**
-     * Creates a new Snake at the given grid Positon
+     * Creates a new Snake object
      *
-     * @param position
+     * @param position        the Grid Positon of the snake
+     * @param color           the Color of the Snake
+     * @param nodeColors      the Array Of Colors the nodes can take
+     * @param cyclesPerTick   the update Intervall for a tick
+     * @param foodPerCrossing the Food needed for Another crossing ( if this is <= 0 the feature is disabled)
      * @param game
      */
-    public Snake(Point position, SnakeGameState game) {
+    public Snake(Point position, Color color, Color[] nodeColors,
+                 int cyclesPerTick, int foodPerCrossing, SnakeGameState game) {
         super(position);
         movingDirection = new Point(0, 0);
         this.game = game;
-        setColor(Color.red);
+        setColor(color);
+        this.foodPerCrossing = foodPerCrossing;
+        this.cyclesPerTick = cyclesPerTick;
+        this.nodeColors = nodeColors;
     }
 
     /**
@@ -145,15 +156,17 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
                 addNode(oldGridPos);
                 length = this.getSnakeLength();
                 game.updateScore(length);
-                remainingCrossings += ((length % FOOD_EATEN_PER_CROSSING) == 0) ? 1 : 0;
-                game.updateRemainingCrossings(remainingCrossings);
+                if (foodPerCrossing > 0) {
+                    remainingCrossings += ((length % foodPerCrossing) == 0) ? 1 : 0;
+                    game.updateRemainingCrossings(remainingCrossings);
+                }
             }
             if (childNode != null) {
                 childNode.updatePosition(oldGridPos);
             }
         }
         cycleCounter++;
-        cycleCounter = cycleCounter % CYCLES_PER_TICK;
+        cycleCounter = cycleCounter % cyclesPerTick;
     }
 
     /**
@@ -183,9 +196,9 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
          */
         public SnakeNode(Point p) {
             super(p);
-            Color color = NODE_COLORS[game.getRandom().nextInt(NODE_COLORS.length)];
+            Color color = nodeColors[game.getRandom().nextInt(nodeColors.length)];
             boolean invert = game.getRandom().nextBoolean();
-            setColor(invert ? SlickUtils.inverColor(color) : color);
+            setColor(invert ? SlickUtils.invertColor(color) : color);
         }
 
         /**

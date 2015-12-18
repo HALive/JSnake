@@ -7,7 +7,8 @@ public enum KeyControls {
     DOWN(KEY_DOWN, KEY_S),
     LEFT(KEY_LEFT, KEY_A),
     RIGHT(KEY_RIGHT, KEY_D),
-    ESCAPE(KEY_ESCAPE);
+    ESCAPE(KEY_ESCAPE),
+    PAUSE(KEY_P);
     private int[] validKeycodes;
 
     KeyControls(int... validKeycodes) {

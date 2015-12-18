@@ -58,7 +58,7 @@ public class JSnake {
     private static void launchGame() {
         logger.info("Launching game....");
         try {
-            AppGameContainer container = new AppGameContainer(new JSnakeGame(null), 800, 600, false);
+            AppGameContainer container = new AppGameContainer(new JSnakeGame(null), 1000, 800, false);
             container.setVSync(true);
             container.setVerbose(true);
             container.setShowFPS(false);

@@ -26,6 +26,8 @@ public class SnakeGameState extends BasicGameState {
      */
     public static final int RECT_SIZE = 20;
 
+    public static final Color FADE_COLOR = new Color(Color.lightGray.r, Color.lightGray.g, Color.lightGray.b, 0.5F);
+
     /**
      * Stores the Grid Of Rectangles rendered in the background
      */
@@ -82,6 +84,8 @@ public class SnakeGameState extends BasicGameState {
      */
     private boolean gameOver = false;
 
+    private boolean paused = false;
+
     @Override
     public int getID() {
         return GameStates.MAIN_GAME.getID();
@@ -128,16 +132,22 @@ public class SnakeGameState extends BasicGameState {
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         renderer.render(g, container, game);
         food.render(g, container, game);
+        if (paused) {
+            g.setColor(FADE_COLOR);
+            g.fillRect(0,0, screenDimension.width, screenDimension.height);
+        }
     }
 
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-        if (!gameOver) {
-            int mouseX = Mouse.getX();
-            int mouseY = (int) (screenDimension.getHeight() - Mouse.getY());
-            renderer.update(container, game, delta, mouseX, mouseY);
-        } else {
-            game.enterState(GameStates.MAIN_MENU.getID());
+        if (!paused) {
+            if (!gameOver) {
+                int mouseX = Mouse.getX();
+                int mouseY = (int) (screenDimension.getHeight() - Mouse.getY());
+                renderer.update(container, game, delta, mouseX, mouseY);
+            } else {
+                game.enterState(GameStates.MAIN_MENU.getID());
+            }
         }
     }
 
@@ -159,6 +169,8 @@ public class SnakeGameState extends BasicGameState {
             snake.moveRight();
         } else if (KeyControls.ESCAPE.isKeycodeVaild(key)) {
 
+        } else if (KeyControls.PAUSE.isKeycodeVaild(key)) {
+            pauseGame();
         }
     }
 
@@ -218,7 +230,7 @@ public class SnakeGameState extends BasicGameState {
      *
      * @param crossings the Number of Remaining Crossings.
      */
-    public void updateRemainigCrossings(int crossings) {
+    public void updateRemainingCrossings(int crossings) {
         this.remainingCrossingsLabel.setMessage("Remaining Crossings: " + crossings);
     }
 
@@ -227,5 +239,12 @@ public class SnakeGameState extends BasicGameState {
      */
     public void setGameOver() {
         gameOver = true;
+    }
+
+    /**
+     * Pauses/Unpauses the Game
+     */
+    private void pauseGame() {
+        paused = !paused;
     }
 }

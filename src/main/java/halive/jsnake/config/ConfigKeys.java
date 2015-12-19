@@ -12,6 +12,7 @@ public enum ConfigKeys {
     FOOD_COLOR("foodColor"),
     SNAKE_HEAD_COLOR("snakeHeadColor"),
     SNAKE_NODE_COLORS("snakeNodeColors"),
+    SNAKE_INVERT_NODE_COLORS("invertNodeColors"),
     CYCLES_PER_TICK("cyclesPerTick"),
     FOOD_PER_CROSSING("foodPerCrossing");
 

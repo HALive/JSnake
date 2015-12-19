@@ -197,8 +197,7 @@ public class Snake extends SnakePart<Snake.SnakeNode> {
         public SnakeNode(Point p) {
             super(p);
             Color color = nodeColors[game.getRandom().nextInt(nodeColors.length)];
-            boolean invert = game.getRandom().nextBoolean();
-            setColor(invert ? SlickUtils.invertColor(color) : color);
+            setColor(color);
         }
 
         /**

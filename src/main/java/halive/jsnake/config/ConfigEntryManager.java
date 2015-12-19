@@ -50,6 +50,8 @@ public class ConfigEntryManager {
             array.put(code);
         }
         entryArrayList.add(new ConfigEntry<>(ConfigKeys.SNAKE_NODE_COLORS.getKey(), DEFAULT_NODE_COLORS));
+        //Add the Invert Colors option
+        entryArrayList.add(new ConfigEntry<>(ConfigKeys.SNAKE_INVERT_NODE_COLORS.getKey(), true));
 
         //Set Some default Game Constants
         entryArrayList.add(new ConfigEntry<>(ConfigKeys.CYCLES_PER_TICK.getKey(), DEFAULT_CYCLES_PER_TICK));

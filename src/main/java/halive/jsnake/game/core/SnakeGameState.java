@@ -133,11 +133,17 @@ public class SnakeGameState extends BasicGameState {
         snakeHeadColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getContents()
                 .getString(ConfigKeys.SNAKE_HEAD_COLOR.getKey()));
         JSONArray a = this.game.getConfig().getContents().getJSONArray(ConfigKeys.SNAKE_NODE_COLORS.getKey());
-        snakeNodeColors = new Color[a.length()];
+        boolean invert = this.game.getConfig().getContents().getBoolean(ConfigKeys.SNAKE_INVERT_NODE_COLORS.getKey());
+        snakeNodeColors = new Color[a.length() * (invert ? 2 : 1)];
         final int[] idx = {0};
         a.forEach(o -> {
             snakeNodeColors[idx[0]] = SlickUtils.getColorFromRGBString(o.toString());
+            System.out.println(o);
             idx[0]++;
+            if (invert) {
+                snakeNodeColors[idx[0]] = SlickUtils.invertColor(snakeNodeColors[idx[0] - 1]);
+                idx[0]++;
+            }
         });
 
         snakeCyclesPerTick = this.game.getConfig().getContents().getInt(ConfigKeys.CYCLES_PER_TICK.getKey());

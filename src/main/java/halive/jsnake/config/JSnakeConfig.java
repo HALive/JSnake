@@ -26,19 +26,23 @@ public class JSnakeConfig {
         if (configFileDestination.exists() &&
                 configFileDestination.canRead() &&
                 !configFileDestination.isDirectory()) {
-            try {
-                FileInputStream in = new FileInputStream(configFileDestination);
-                JSONTokener loader = new JSONTokener(in);
-                configFileContents = new JSONObject(loader);
-                in.close();
-            } catch (IOException e) {
-                JSnake.logger.log(Level.ALL, "Could not Load the ConfigFile. Using Defaults");
-                initializeWithDefaults(true);
-            }
+            loadFromFile();
         } else if (configFileDestination.isDirectory()) {
             throw new IOException("Invalid Config file. This is a Directory.");
         } else {
             initializeWithDefaults(false);
+        }
+    }
+
+    private void loadFromFile() {
+        try {
+            FileInputStream in = new FileInputStream(configFileDestination);
+            JSONTokener loader = new JSONTokener(in);
+            configFileContents = new JSONObject(loader);
+            in.close();
+        } catch (IOException e) {
+            JSnake.logger.log(Level.ALL, "Could not Load the ConfigFile. Using Defaults");
+            initializeWithDefaults(true);
         }
     }
 
@@ -64,6 +68,8 @@ public class JSnakeConfig {
                     }
                 }
             }
+            //This is done To fix the game from crashing once the game is launched and no config has been generated
+            this.loadFromFile();
         }
     }
 

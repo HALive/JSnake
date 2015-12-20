@@ -3,10 +3,9 @@
  * For Licence Information see Licence File.
  */
 
-package halive.jsnake.game.components;
+package halive.jsnake.game.core.components;
 
 import halive.jsnake.game.core.SnakeGameState;
-import halive.util.SlickUtils;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.state.StateBasedGame;

@@ -9,11 +9,11 @@ import halive.jsnake.config.ConfigKeys;
 import halive.jsnake.game.ComponentRenderer;
 import halive.jsnake.game.GameStates;
 import halive.jsnake.game.JSnakeGame;
-import halive.jsnake.game.components.CenterLabel;
-import halive.jsnake.game.components.FoodRectangle;
-import halive.jsnake.game.components.GridRectangle;
-import halive.jsnake.game.components.Label;
-import halive.jsnake.game.components.Snake;
+import halive.jsnake.game.core.components.CenterLabel;
+import halive.jsnake.game.core.components.FoodRectangle;
+import halive.jsnake.game.core.components.GridRectangle;
+import halive.jsnake.game.core.components.Label;
+import halive.jsnake.game.core.components.Snake;
 import halive.util.SlickUtils;
 import org.json.JSONArray;
 import org.lwjgl.input.Mouse;
@@ -35,7 +35,8 @@ public class SnakeGameState extends BasicGameState {
      */
     public static final int RECT_SIZE = 20;
 
-    public static final Color FADE_COLOR = new Color(Color.lightGray.r, Color.lightGray.g, Color.lightGray.b, 0.5F);
+    public static final Color FADE_COLOR =
+            new Color(Color.lightGray.r, Color.lightGray.g, Color.lightGray.b, 0.5F);
 
     /**
      * Stores the FoodColor loaded from the Config file
@@ -118,12 +119,25 @@ public class SnakeGameState extends BasicGameState {
      * This Flag is True if the Game should get paused.
      */
     private boolean paused = false;
+    private Label pausedLabel;
+
+    /**
+     * This stores a Reference to the overlay menu
+     */
+    private OverlayMenu overlayMenu;
 
     @Override
     public int getID() {
         return GameStates.MAIN_GAME.getID();
     }
 
+    /**
+     * Misc initialisation
+     *
+     * @param container
+     * @param game
+     * @throws SlickException
+     */
     @Override
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
         this.game = (JSnakeGame) game;
@@ -150,12 +164,21 @@ public class SnakeGameState extends BasicGameState {
         snakeFoodPerCrossing = this.game.getConfig().getContents().getInt(ConfigKeys.FOOD_PER_CROSSING.getKey());
     }
 
+    /**
+     * Reinitializes the Components to a Fresh state.
+     *
+     * @param container
+     * @param game
+     * @throws SlickException
+     */
     @Override
     public void enter(GameContainer container, StateBasedGame game) throws SlickException {
         gameOver = false;
         score = 1;
         renderer = new ComponentRenderer();
 
+        //<editor-fold desc="Initialize Components Rendered By the Renderer">
+        //Initialize the Grid
         grid = new GridRectangle[(screenDimension.width / RECT_SIZE) - 2][(screenDimension.height / RECT_SIZE) - 2];
         int prio = 0;
         for (int x = 0; x < grid.length; x++) {
@@ -166,11 +189,12 @@ public class SnakeGameState extends BasicGameState {
                 prio++;
             }
         }
+        //Initialize the Snake
         snake = new Snake(new Point(random.nextInt(grid.length), random.nextInt(grid[0].length)), snakeHeadColor,
                 snakeNodeColors, snakeCyclesPerTick, snakeFoodPerCrossing, this);
         renderer.addComponentToRender(prio, snake);
         prio++;
-        spawnNewFoodRectangle();
+        //initialize the Labels
         scoreLabel = new CenterLabel(new Point(0, 5), new Dimension(screenDimension.width, 10),
                 "Score :" + score);
         renderer.addComponentToRender(prio, scoreLabel);
@@ -179,9 +203,26 @@ public class SnakeGameState extends BasicGameState {
         renderer.addComponentToRender(prio, remainingCrossingsLabel);
         prio++;
 
+        //Initialize the overlayMenu
+        overlayMenu = new OverlayMenu(screenDimension, FADE_COLOR);
+        renderer.addComponentToRender(prio, overlayMenu);
         renderer.init(container, game);
+        //</editor-fold>
+
+        spawnNewFoodRectangle();
+        pausedLabel = new CenterLabel(new Point(0, (screenDimension.height / 2) - 20),
+                new Dimension(screenDimension.width, 20),
+                "Paused. Press \"p\" to unpause...");
     }
 
+    /**
+     * Renders all Components
+     *
+     * @param container
+     * @param game
+     * @param g
+     * @throws SlickException
+     */
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         renderer.render(g, container, game);
@@ -189,20 +230,43 @@ public class SnakeGameState extends BasicGameState {
         if (paused) {
             g.setColor(FADE_COLOR);
             g.fillRect(0, 0, screenDimension.width, screenDimension.height);
+            pausedLabel.render(g, container, game);
         }
     }
 
+    /**
+     * Updates All Components in the State
+     *
+     * @param container
+     * @param game
+     * @param delta
+     * @throws SlickException
+     */
     @Override
     public void update(GameContainer container, StateBasedGame game, int delta) throws SlickException {
-        if (!paused) {
-            if (!gameOver) {
-                int mouseX = Mouse.getX();
-                int mouseY = (int) (screenDimension.getHeight() - Mouse.getY());
-                renderer.update(container, game, delta, mouseX, mouseY);
-            } else {
+        int mouseX = Mouse.getX();
+        int mouseY = (int) (screenDimension.getHeight() - Mouse.getY());
+        if (!paused && !overlayMenu.isActive()) {
+            renderer.update(container, game, delta, mouseX, mouseY);
+            if (gameOver) {
                 game.enterState(GameStates.MAIN_MENU.getID());
             }
+        } else if (overlayMenu.isActive()) {
+            overlayMenu.update(container, game, delta, mouseX, mouseY);
         }
+    }
+
+    /**
+     * Handles mouse input if the Overlay Menu is Active.
+     *
+     * @param button
+     * @param x
+     * @param y
+     * @param clickCount
+     */
+    @Override
+    public void mouseClicked(int button, int x, int y, int clickCount) {
+        overlayMenu.onMouseClick(x, y, button);
     }
 
     /**
@@ -213,18 +277,25 @@ public class SnakeGameState extends BasicGameState {
      */
     @Override
     public void keyPressed(int key, char c) {
-        if (KeyControls.UP.isKeycodeVaild(key)) {
-            snake.moveUp();
-        } else if (KeyControls.DOWN.isKeycodeVaild(key)) {
-            snake.moveDown();
-        } else if (KeyControls.LEFT.isKeycodeVaild(key)) {
-            snake.moveLeft();
-        } else if (KeyControls.RIGHT.isKeycodeVaild(key)) {
-            snake.moveRight();
-        } else if (KeyControls.ESCAPE.isKeycodeVaild(key)) {
-
-        } else if (KeyControls.PAUSE.isKeycodeVaild(key)) {
+        if (isGameRunning()) {
+            if (KeyControls.UP.isKeycodeVaild(key) && isGameRunning()) {
+                snake.moveUp();
+                return;
+            } else if (KeyControls.DOWN.isKeycodeVaild(key)) {
+                snake.moveDown();
+                return;
+            } else if (KeyControls.LEFT.isKeycodeVaild(key)) {
+                snake.moveLeft();
+                return;
+            } else if (KeyControls.RIGHT.isKeycodeVaild(key)) {
+                snake.moveRight();
+                return;
+            }
+        }
+        if (KeyControls.PAUSE.isKeycodeVaild(key) && !overlayMenu.isActive()) {
             pauseGame();
+        } else if (KeyControls.ESCAPE.isKeycodeVaild(key)) {
+            overlayMenu.toggleMenu();
         }
     }
 
@@ -300,5 +371,14 @@ public class SnakeGameState extends BasicGameState {
      */
     private void pauseGame() {
         paused = !paused;
+    }
+
+    /**
+     * Returns true if the game is not paused and the overlay menu does not get rendered
+     *
+     * @return
+     */
+    public boolean isGameRunning() {
+        return !(paused || overlayMenu.isActive());
     }
 }

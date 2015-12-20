@@ -7,7 +7,7 @@ package halive.jsnake.game.menu;
 
 import halive.jsnake.game.ComponentRenderer;
 import halive.jsnake.game.GameStates;
-import halive.jsnake.game.components.Button;
+import halive.jsnake.game.core.components.Button;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;

@@ -5,8 +5,8 @@
 
 package halive.jsnake.game;
 
-import halive.jsnake.game.components.Button;
-import halive.jsnake.game.components.Component;
+import halive.jsnake.game.core.components.Button;
+import halive.jsnake.game.core.components.Component;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.state.StateBasedGame;

@@ -5,7 +5,6 @@
 
 package halive.jsnake;
 
-import halive.jsnake.config.ConfigKeys;
 import halive.jsnake.config.JSnakeConfig;
 import halive.jsnake.game.JSnakeGame;
 import halive.nativeloader.NativeLoader;
@@ -16,7 +15,6 @@ import org.newdawn.slick.SlickException;
 
 import javax.swing.ProgressMonitor;
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -62,12 +60,7 @@ public class JSnake {
      */
     private static JSnakeConfig loadConfig() {
         logger.info("Loading Configuration File...");
-        JSnakeConfig config = null;
-        try {
-            config = new JSnakeConfig(CONFIG_FILE);
-        } catch (IOException e) {
-            logger.log(Level.ALL, "Something went wrong loading the config file.", e);
-        }
+        JSnakeConfig config = JSnakeConfig.getConfiguraton(CONFIG_FILE);
         return config;
     }
 
@@ -77,10 +70,8 @@ public class JSnake {
     private static void launchGame(JSnakeConfig cfg) {
         logger.info("Launching game....");
         try {
-            int w = cfg.getContents().getJSONObject(ConfigKeys.WINDOW_DIMENSION.getKey())
-                    .getInt(ConfigKeys.WINDOW_WIDTH.getKey());
-            int h = cfg.getContents().getJSONObject(ConfigKeys.WINDOW_DIMENSION.getKey())
-                    .getInt(ConfigKeys.WINDOW_HEIGHT.getKey());
+            int w = cfg.getWindowDimensions().width;
+            int h = cfg.getWindowDimensions().height;
             AppGameContainer container = new AppGameContainer(new JSnakeGame(cfg), w, h, false);
             container.setVSync(true);
             container.setVerbose(true);

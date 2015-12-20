@@ -5,7 +5,6 @@
 
 package halive.jsnake.game.core;
 
-import halive.jsnake.config.ConfigKeys;
 import halive.jsnake.game.ComponentRenderer;
 import halive.jsnake.game.GameStates;
 import halive.jsnake.game.JSnakeGame;
@@ -15,7 +14,6 @@ import halive.jsnake.game.core.components.GridRectangle;
 import halive.jsnake.game.core.components.Label;
 import halive.jsnake.game.core.components.Snake;
 import halive.util.SlickUtils;
-import org.json.JSONArray;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -142,15 +140,13 @@ public class SnakeGameState extends BasicGameState {
     public void init(GameContainer container, StateBasedGame game) throws SlickException {
         this.game = (JSnakeGame) game;
         this.screenDimension = new Dimension(container.getWidth(), container.getHeight());
-        foodColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getContents()
-                .getString(ConfigKeys.FOOD_COLOR.getKey()));
-        snakeHeadColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getContents()
-                .getString(ConfigKeys.SNAKE_HEAD_COLOR.getKey()));
-        JSONArray a = this.game.getConfig().getContents().getJSONArray(ConfigKeys.SNAKE_NODE_COLORS.getKey());
-        boolean invert = this.game.getConfig().getContents().getBoolean(ConfigKeys.SNAKE_INVERT_NODE_COLORS.getKey());
-        snakeNodeColors = new Color[a.length() * (invert ? 2 : 1)];
+        foodColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getFoodColor());
+        snakeHeadColor = SlickUtils.getColorFromRGBString(this.game.getConfig().getSnakeHeadColor());
+        String[] a = this.game.getConfig().getSnakeNodeColors();
+        boolean invert = this.game.getConfig().isInvertSnakeNodeColors();
+        snakeNodeColors = new Color[a.length * (invert ? 2 : 1)];
         final int[] idx = {0};
-        a.forEach(o -> {
+        for (String o : a) {
             snakeNodeColors[idx[0]] = SlickUtils.getColorFromRGBString(o.toString());
             System.out.println(o);
             idx[0]++;
@@ -158,10 +154,10 @@ public class SnakeGameState extends BasicGameState {
                 snakeNodeColors[idx[0]] = SlickUtils.invertColor(snakeNodeColors[idx[0] - 1]);
                 idx[0]++;
             }
-        });
+        }
 
-        snakeCyclesPerTick = this.game.getConfig().getContents().getInt(ConfigKeys.CYCLES_PER_TICK.getKey());
-        snakeFoodPerCrossing = this.game.getConfig().getContents().getInt(ConfigKeys.FOOD_PER_CROSSING.getKey());
+        snakeCyclesPerTick = this.game.getConfig().getCyclesPerTick();
+        snakeFoodPerCrossing = this.game.getConfig().getFoodPerCrossing();
     }
 
     /**

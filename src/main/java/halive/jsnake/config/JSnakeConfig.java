@@ -5,75 +5,99 @@
 
 package halive.jsnake.config;
 
+import com.google.gson.Gson;
 import halive.jsnake.JSnake;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
+import java.awt.Dimension;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 
 public class JSnakeConfig {
 
-    private File configFileDestination;
-    private JSONObject configFileContents;
+    private Dimension windowDimensions = new Dimension(800, 600);
+    private String foodColor = "#FF0000";
+    private String snakeHeadColor = "#CC5F00";
+    private String[] snakeNodeColors = {"#A5A5A5", "#0015FF", "#FFA600", "#26FF00", "#00FFFC"};
+    private boolean invertSnakeNodeColors = false;
+    private int cyclesPerTick = 5;
+    private int foodPerCrossing = 10;
 
-    public JSnakeConfig(File configFileDestination) throws IOException {
-        this.configFileDestination = configFileDestination;
-        configFileContents = new JSONObject();
-        if (configFileDestination.exists() &&
-                configFileDestination.canRead() &&
-                !configFileDestination.isDirectory()) {
-            loadFromFile();
-        } else if (configFileDestination.isDirectory()) {
-            throw new IOException("Invalid Config file. This is a Directory.");
-        } else {
-            initializeWithDefaults(false);
-        }
+    private JSnakeConfig() {
+
     }
 
-    private void loadFromFile() {
-        try {
-            FileInputStream in = new FileInputStream(configFileDestination);
-            JSONTokener loader = new JSONTokener(in);
-            configFileContents = new JSONObject(loader);
-            in.close();
-        } catch (IOException e) {
-            JSnake.logger.log(Level.ALL, "Could not Load the ConfigFile. Using Defaults");
-            initializeWithDefaults(true);
-        }
-    }
-
-    private void initializeWithDefaults(boolean causedByError) {
+    private JSnakeConfig(File configFileDestination) throws IOException {
         JSnake.logger.log(Level.INFO, "Creating default Configuration file.");
-        for (ConfigEntryManager.ConfigEntry entry : ConfigEntryManager.entries) {
-            configFileContents.put(entry.getKey(), entry.getDefaultValue());
-        }
-        if (!causedByError) {
-            JSnake.logger.log(Level.INFO, "Saving configuration file to disk.");
-            FileWriter out = null;
-            try {
-                out = new FileWriter(configFileDestination);
-                configFileContents.write(out);
-            } catch (IOException e) {
-                JSnake.logger.log(Level.ALL, "Could not save config File", e);
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException e) {
-                        JSnake.logger.log(Level.ALL, "Could not close Stream.", e);
-                    }
-                }
-            }
-            //This is done To fix the game from crashing once the game is launched and no config has been generated
-            this.loadFromFile();
+        Gson gson = new Gson();
+        FileWriter out = null;
+        try {
+            out = new FileWriter(configFileDestination);
+            String configFile = gson.toJson(this);
+            out.append(configFile);
+        } catch (IOException e) {
+            JSnake.logger.log(Level.SEVERE, "Could not wirte Default Config. Using Defaults.", e);
+        } finally {
+            out.close();
         }
     }
 
-    public JSONObject getContents() {
-        return configFileContents;
+    public static JSnakeConfig getConfiguraton(File f) {
+        if (!f.exists()) {
+            try {
+                return new JSnakeConfig(f);
+            } catch (IOException e) {
+                JSnake.logger.log(Level.SEVERE, "The Config file Could not get Created. Using Defaults.", e);
+                return new JSnakeConfig();
+            }
+        } else if (f.isDirectory() || !f.canRead()) {
+            JSnake.logger.log(Level.SEVERE, "Using Default Config. Config is not Readable.");
+            return new JSnakeConfig();
+        }
+        Gson gson = new Gson();
+        FileReader r = null;
+        try {
+            r = new FileReader(f);
+            Object o = gson.fromJson(r, JSnakeConfig.class);
+            return (JSnakeConfig) o;
+        } catch (IOException e) {
+            JSnake.logger.log(Level.SEVERE, "Using Default Config. Config is not Readable.", e);
+            return new JSnakeConfig();
+        } finally {
+            try {
+                r.close();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    public int getCyclesPerTick() {
+        return cyclesPerTick;
+    }
+
+    public String getFoodColor() {
+        return foodColor;
+    }
+
+    public int getFoodPerCrossing() {
+        return foodPerCrossing;
+    }
+
+    public boolean isInvertSnakeNodeColors() {
+        return invertSnakeNodeColors;
+    }
+
+    public String getSnakeHeadColor() {
+        return snakeHeadColor;
+    }
+
+    public String[] getSnakeNodeColors() {
+        return snakeNodeColors;
+    }
+
+    public Dimension getWindowDimensions() {
+        return windowDimensions;
     }
 }

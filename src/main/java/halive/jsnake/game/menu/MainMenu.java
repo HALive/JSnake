@@ -42,9 +42,12 @@ public class MainMenu extends BasicGameState {
         this.screenDimension = new Dimension(container.getWidth(), container.getHeight());
         renderer = new ComponentRenderer();
 
-        startGameButton = new Button(new Point(200, 100), new Dimension(400, 80), Color.lightGray, "Start Game");
-        highscoreButton = new Button(new Point(200, 200), new Dimension(400, 80), Color.lightGray, "Highscores");
-        exitButton = new Button(new Point(200, 300), new Dimension(400, 80), Color.lightGray, "Exit");
+        startGameButton = new Button(new Point((screenDimension.width / 2) - 200, 100),
+                new Dimension(400, 80), Color.lightGray, "Start Game");
+        highscoreButton = new Button(new Point((screenDimension.width / 2) - 200, 200),
+                new Dimension(400, 80), Color.lightGray, "Highscores");
+        exitButton = new Button(new Point((screenDimension.width / 2) - 200, 300),
+                new Dimension(400, 80), Color.lightGray, "Exit");
 
         startGameButton.setButtonClickListener((x, y, b) -> startNewGame(b));
         highscoreButton.setButtonClickListener((x, y, b) -> showHighscores(b));

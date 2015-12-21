@@ -200,7 +200,7 @@ public class SnakeGameState extends BasicGameState {
         prio++;
 
         //Initialize the overlayMenu
-        overlayMenu = new OverlayMenu(screenDimension, FADE_COLOR);
+        overlayMenu = new OverlayMenu(screenDimension, FADE_COLOR, this);
         renderer.addComponentToRender(prio, overlayMenu);
         renderer.init(container, game);
         //</editor-fold>
@@ -376,5 +376,9 @@ public class SnakeGameState extends BasicGameState {
      */
     public boolean isGameRunning() {
         return !(paused || overlayMenu.isActive());
+    }
+
+    public JSnakeGame getGame() {
+        return game;
     }
 }

@@ -62,6 +62,11 @@ public class JSnake {
         logger.info("Loading Configuration File...");
         JSnakeConfig config = JSnakeConfig.getConfiguration(CONFIG_FILE);
         config.calculateSignature();
+        File highscoreFolder = config.getHighscoreFolder();
+        if (!highscoreFolder.exists()) {
+            logger.info("Creating Highscore Folder: " + highscoreFolder.getName());
+            highscoreFolder.mkdirs();
+        }
         return config;
     }
 

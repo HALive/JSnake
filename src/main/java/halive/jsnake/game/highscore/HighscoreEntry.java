@@ -38,4 +38,8 @@ public class HighscoreEntry {
     public boolean isValidHighscoreEntry(String cfgSignature) {
         return cfgSignature.equals(configSignature);
     }
+
+    public String getFileName() {
+        return name + "-" + timeStamp + ".json";
+    }
 }

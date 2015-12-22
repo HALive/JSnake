@@ -28,6 +28,8 @@ public class JSnakeConfig {
     private int cyclesPerTick = 5;
     private int foodPerCrossing = 10;
 
+    private String highscoreFolder = "highscores";
+
     private transient String configSignature;
 
     private JSnakeConfig() {
@@ -122,5 +124,9 @@ public class JSnakeConfig {
 
     public String getConfigSignature() {
         return configSignature;
+    }
+
+    public File getHighscoreFolder() {
+        return new File(highscoreFolder);
     }
 }

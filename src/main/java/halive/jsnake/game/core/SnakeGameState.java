@@ -245,7 +245,8 @@ public class SnakeGameState extends BasicGameState {
         if (!paused && !overlayMenu.isActive()) {
             renderer.update(container, game, delta, mouseX, mouseY);
             if (gameOver) {
-                game.enterState(GameStates.MAIN_MENU.getID());
+                this.game.setLastHighScore(score);
+                game.enterState(GameStates.GAME_OVER.getID());
             }
         } else if (overlayMenu.isActive()) {
             overlayMenu.update(container, game, delta, mouseX, mouseY);

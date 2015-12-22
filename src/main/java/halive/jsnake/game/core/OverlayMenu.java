@@ -67,12 +67,11 @@ public class OverlayMenu extends Component {
     }
 
 
-
     public void onMouseClick(int x, int y, int btn) {
         if (active && btn == 0) {
-            if(mainMenuButton.isOnComponent(x,y)) {
+            if (mainMenuButton.isOnComponent(x, y)) {
                 mainMenuButton.buttonClicked(x, y, btn);
-            }else if (resumeGameButton.isOnComponent(x, y)) {
+            } else if (resumeGameButton.isOnComponent(x, y)) {
                 resumeGameButton.buttonClicked(x, y, btn);
             }
         }

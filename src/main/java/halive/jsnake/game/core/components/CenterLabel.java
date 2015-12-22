@@ -7,6 +7,7 @@ package halive.jsnake.game.core.components;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.util.FontUtils;
 
@@ -29,6 +30,11 @@ public class CenterLabel extends Label {
     public CenterLabel(Point position, Dimension boxToCenterIn, String text) {
         super(position, text);
         this.size = boxToCenterIn;
+    }
+
+    public CenterLabel(Point position, Dimension boxToCenterIn, String text, int fontSize) {
+        this(position, boxToCenterIn, text);
+        setFont(new TrueTypeFont(new java.awt.Font("Arial", java.awt.Font.BOLD, fontSize), true));
     }
 
     @Override

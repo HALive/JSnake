@@ -12,11 +12,16 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.GameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import java.awt.Dimension;
 import java.util.logging.Level;
 
 public class JSnakeGame extends StateBasedGame {
 
     private JSnakeConfig config;
+
+    private int lastHighScore = -1;
+
+    private Dimension screenDimension;
 
     public JSnakeGame(JSnakeConfig config) {
         super("JSnake");
@@ -25,6 +30,7 @@ public class JSnakeGame extends StateBasedGame {
 
     @Override
     public void initStatesList(GameContainer container) throws SlickException {
+        screenDimension = new Dimension(container.getWidth(), container.getHeight());
         for (GameStates state : GameStates.values()) {
             try {
                 GameState s = state.getStateClass().newInstance();
@@ -33,6 +39,18 @@ public class JSnakeGame extends StateBasedGame {
                 JSnake.logger.log(Level.ALL, "Could not Initialize GameStates.", e);
             }
         }
+    }
+
+    public int getLastHighScore() {
+        return lastHighScore;
+    }
+
+    public void setLastHighScore(int lastHighScore) {
+        this.lastHighScore = lastHighScore;
+    }
+
+    public Dimension getScreenDimension() {
+        return screenDimension;
     }
 
     public JSnakeConfig getConfig() {

@@ -7,8 +7,11 @@ package halive.jsnake.config;
 
 import com.google.gson.Gson;
 import halive.jsnake.JSnake;
+import halive.util.HashUtils;
 
 import java.awt.Dimension;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -24,6 +27,8 @@ public class JSnakeConfig {
     private boolean invertSnakeNodeColors = false;
     private int cyclesPerTick = 5;
     private int foodPerCrossing = 10;
+
+    private transient String configSignature;
 
     private JSnakeConfig() {
 
@@ -44,7 +49,7 @@ public class JSnakeConfig {
         }
     }
 
-    public static JSnakeConfig getConfiguraton(File f) {
+    public static JSnakeConfig getConfiguration(File f) {
         if (!f.exists()) {
             try {
                 return new JSnakeConfig(f);
@@ -99,5 +104,23 @@ public class JSnakeConfig {
 
     public Dimension getWindowDimensions() {
         return windowDimensions;
+    }
+
+    public void calculateSignature() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        DataOutputStream dout = new DataOutputStream(out);
+        try {
+            dout.writeInt(windowDimensions.width);
+            dout.writeInt(windowDimensions.height);
+            dout.writeInt(cyclesPerTick);
+            dout.writeInt(foodPerCrossing);
+        } catch (IOException e) {
+        }
+        configSignature = HashUtils.getSHA256Hash(out.toByteArray());
+        JSnake.logger.info("The Config Signature is: " + configSignature);
+    }
+
+    public String getConfigSignature() {
+        return configSignature;
     }
 }

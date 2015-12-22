@@ -60,7 +60,8 @@ public class JSnake {
      */
     private static JSnakeConfig loadConfig() {
         logger.info("Loading Configuration File...");
-        JSnakeConfig config = JSnakeConfig.getConfiguraton(CONFIG_FILE);
+        JSnakeConfig config = JSnakeConfig.getConfiguration(CONFIG_FILE);
+        config.calculateSignature();
         return config;
     }
 

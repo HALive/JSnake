@@ -77,7 +77,9 @@ public class MainMenu extends BasicGameState {
     }
 
     private void showHighscores(int button) {
-
+        if (button == 0) {
+            this.game.enterState(GameStates.HIGHSCORE_DISPLAY.getID());
+        }
     }
 
     private void exitGame(int button) {

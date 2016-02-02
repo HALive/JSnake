@@ -8,6 +8,7 @@ package halive.jsnake.game.menu;
 import halive.jsnake.game.ComponentRenderer;
 import halive.jsnake.game.GameStates;
 import halive.jsnake.game.core.components.Button;
+import halive.jsnake.game.core.components.CenterLabel;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -26,6 +27,8 @@ public class MainMenu extends BasicGameState {
     private Button highscoreButton;
     private Button exitButton;
 
+    private CenterLabel heading;
+
     private ComponentRenderer renderer;
 
     private Dimension screenDimension;
@@ -42,17 +45,21 @@ public class MainMenu extends BasicGameState {
         this.screenDimension = new Dimension(container.getWidth(), container.getHeight());
         renderer = new ComponentRenderer();
 
-        startGameButton = new Button(new Point((screenDimension.width / 2) - 200, 100),
+        heading = new CenterLabel(new Point((screenDimension.width / 2) - 200, 50),
+                new Dimension(400, 80),"JSnake", 50);
+
+        startGameButton = new Button(new Point((screenDimension.width / 2) - 200, 200),
                 new Dimension(400, 80), Color.lightGray, "Start Game");
-        highscoreButton = new Button(new Point((screenDimension.width / 2) - 200, 200),
+        highscoreButton = new Button(new Point((screenDimension.width / 2) - 200, 300),
                 new Dimension(400, 80), Color.lightGray, "Highscores");
-        exitButton = new Button(new Point((screenDimension.width / 2) - 200, 300),
+        exitButton = new Button(new Point((screenDimension.width / 2) - 200, 400),
                 new Dimension(400, 80), Color.lightGray, "Exit");
 
         startGameButton.setButtonClickListener((x, y, b) -> startNewGame(b));
         highscoreButton.setButtonClickListener((x, y, b) -> showHighscores(b));
         exitButton.setButtonClickListener((x, y, b) -> exitGame(b));
 
+        renderer.addComponentToRender(99, heading);
         renderer.addComponentToRender(100, startGameButton);
         renderer.addComponentToRender(101, highscoreButton);
         renderer.addComponentToRender(102, exitButton);

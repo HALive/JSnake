@@ -21,7 +21,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Implementation-Title': 'Visual Sort',
+        attributes 'Implementation-Title': 'JSnake',
                 'Implementation-Version': version,
                 'Class-Path': '.',
                 'Main-Class': 'halive.jsnake.JSnake'

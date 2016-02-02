@@ -148,7 +148,6 @@ public class SnakeGameState extends BasicGameState {
         final int[] idx = {0};
         for (String o : a) {
             snakeNodeColors[idx[0]] = SlickUtils.getColorFromRGBString(o.toString());
-            System.out.println(o);
             idx[0]++;
             if (invert) {
                 snakeNodeColors[idx[0]] = SlickUtils.invertColor(snakeNodeColors[idx[0] - 1]);

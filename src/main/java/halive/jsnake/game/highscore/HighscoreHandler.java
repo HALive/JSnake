@@ -6,14 +6,15 @@
 package halive.jsnake.game.highscore;
 
 import com.google.gson.Gson;
+import halive.jsnake.JSnake;
 import halive.jsnake.config.JSnakeConfig;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 public class HighscoreHandler {
 
@@ -27,19 +28,19 @@ public class HighscoreHandler {
         highscores = new ArrayList<>();
     }
 
-    public void loadFiles()  {
+    public void loadFiles() {
         highscores = new ArrayList<>();
         Gson gson = new Gson();
         for (File file : highscoreFolder.listFiles()) {
-            if(!file.isDirectory() && file.getPath().toLowerCase().endsWith(".json")) {
-                System.out.println("Loading: "+file.getPath());
+            if (!file.isDirectory() && file.getPath().toLowerCase().endsWith(".json")) {
+                JSnake.logger.info("Loading: " + file.getName());
                 try {
                     HighscoreEntry highscoreEntry = gson.fromJson(new FileReader(file), HighscoreEntry.class);
-                    if (highscoreEntry.isValidHighscoreEntry(currentConfigSignature))
+                    if (highscoreEntry.isValidHighscoreEntry(currentConfigSignature)) {
                         highscores.add(highscoreEntry);
+                    }
                 } catch (Exception e) {
-                    System.err.println("Error Loading HighscoreEntry");
-                    e.printStackTrace();
+                    JSnake.logger.log(Level.SEVERE, "Could not load Highscore Entry", e);
                 }
             }
         }

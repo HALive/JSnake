@@ -7,6 +7,8 @@ package halive.jsnake;
 
 import halive.jsnake.config.JSnakeConfig;
 import halive.jsnake.game.JSnakeGame;
+import halive.jsnake.game.highscore.HighscoreEntry;
+import halive.jsnake.game.highscore.HighscoreSerializer;
 import halive.nativeloader.NativeLoader;
 import halive.nativeloader.NativeLoaderUtils;
 import halive.util.PrintStreamHandler;
@@ -40,9 +42,14 @@ public class JSnake {
      */
     public static void main(String[] args) throws Exception {
         boolean devMode = false;
+        boolean createEntries = false;
         if (args.length != 0) {
-            if (args[0].equalsIgnoreCase("-native-debug")) {
-                devMode = true;
+            for (String arg : args) {
+                if (arg.equalsIgnoreCase("-native-debug")) {
+                    devMode = true;
+                } else if (arg.equalsIgnoreCase("-test-entries")) {
+                    createEntries = true;
+                }
             }
         }
         initializeLogger();
@@ -52,7 +59,23 @@ public class JSnake {
             logger.log(Level.ALL, "Closing the Application. No Config has been Loaded.");
             return;
         }
+        if (createEntries) {
+            generateTestEntries(config);
+        }
         launchGame(config);
+    }
+
+    /**
+     * Generates 100 Test Entries. for the Highscore list.
+     *
+     * @param config
+     */
+    private static void generateTestEntries(JSnakeConfig config) {
+        for (int i = 0; i < 100; i++) {
+            HighscoreEntry e = new HighscoreEntry("Test-" + i, (int) (Math.random() * 1000), config.getConfigSignature());
+            HighscoreSerializer s = new HighscoreSerializer(e, config.getHighscoreFolder());
+            s.start();
+        }
     }
 
     /**

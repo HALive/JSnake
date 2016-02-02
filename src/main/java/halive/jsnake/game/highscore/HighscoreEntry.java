@@ -5,7 +5,7 @@
 
 package halive.jsnake.game.highscore;
 
-public class HighscoreEntry {
+public class HighscoreEntry implements Comparable<HighscoreEntry> {
 
     private int score;
     private String name;
@@ -41,5 +41,14 @@ public class HighscoreEntry {
 
     public String getFileName() {
         return name + "-" + timeStamp + ".json";
+    }
+
+    @Override
+    public int compareTo(HighscoreEntry o) {
+        int scoreValueComp = (int) Math.signum(o.score - score);
+        if (scoreValueComp != 0) {
+            return scoreValueComp;
+        }
+        return (int) Math.signum(o.timeStamp - timeStamp);
     }
 }

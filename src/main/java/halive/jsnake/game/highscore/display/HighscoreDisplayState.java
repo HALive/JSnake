@@ -9,6 +9,7 @@ import halive.jsnake.game.GameStates;
 import halive.jsnake.game.JSnakeGame;
 import halive.jsnake.game.core.components.Button;
 import halive.jsnake.game.core.components.CenterLabel;
+import halive.jsnake.game.highscore.HighscoreHandler;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -20,7 +21,6 @@ import org.newdawn.slick.state.StateBasedGame;
 import java.awt.Dimension;
 import java.awt.Point;
 
-
 public class HighscoreDisplayState extends BasicGameState {
 
     private Button backButton;
@@ -31,6 +31,9 @@ public class HighscoreDisplayState extends BasicGameState {
     private GameContainer container;
 
     private Dimension screenDimension;
+
+    private HighscoreHandler highscoreHandler;
+    private HighscoreList highscoreList;
 
     @Override
     public int getID() {
@@ -51,12 +54,24 @@ public class HighscoreDisplayState extends BasicGameState {
         });
 
         heading = new CenterLabel(new Point(container.getWidth() / 2 - 100, 10),
-                new Dimension(200, 50), "Highscores",40);
+                new Dimension(200, 50), "Highscores", 40);
+
+        highscoreHandler = new HighscoreHandler(this.game.getConfig().getHighscoreFolder(), this.game.getConfig());
+        highscoreList = new HighscoreList(new Point(10, 80),
+                new Dimension((container.getWidth() - 20),
+                        (container.getHeight() - 180) - ((container.getHeight() - 180) % 20)));
+    }
+
+    @Override
+    public void enter(GameContainer container, StateBasedGame game) throws SlickException {
+        highscoreHandler.loadFiles();
+        highscoreList.updateEntries(highscoreHandler.getEntries());
     }
 
     @Override
     public void render(GameContainer container, StateBasedGame game, Graphics g) throws SlickException {
         heading.render(g, container, game);
+        highscoreList.render(g, container, game);
         backButton.render(g, container, game);
     }
 
@@ -72,5 +87,15 @@ public class HighscoreDisplayState extends BasicGameState {
         if (backButton.isOnComponent(x, y)) {
             backButton.buttonClicked(x, y, button);
         }
+    }
+
+    @Override
+    public void keyPressed(int key, char c) {
+        highscoreList.onKeyPressed(key, c);
+    }
+
+    @Override
+    public void mouseWheelMoved(int newValue) {
+        highscoreList.onScrolled(newValue);
     }
 }
